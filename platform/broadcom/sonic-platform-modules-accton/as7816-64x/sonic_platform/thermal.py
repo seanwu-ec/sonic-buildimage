@@ -29,12 +29,12 @@ class Thermal(PddfThermal):
     """PDDF Platform-Specific Thermal class"""
 
     __thresholds = {
-        0: Threshold(59, 56, 53),
-        1: Threshold(60, 57, 54),
-        2: Threshold(70.25, 68.625, 67),
-        3: Threshold(70.49, 70.245, 70),
-        4: Threshold(56, 55.5, 55),
-        5: Threshold(55.75, 54.875, 54)
+        0: Threshold(59.0, 56.0, 53.0),
+        1: Threshold(60.0, 57.0, 54.0),
+        2: Threshold(70.25, 68.625, 67.0),
+        3: Threshold(70.49, 70.245, 70.0),
+        4: Threshold(56.0, 55.5, 55.0),
+        5: Threshold(55.75, 54.875, 54.0)
     }
 
     def __init__(self, index, pddf_data=None, pddf_plugin_data=None):
@@ -49,17 +49,17 @@ class Thermal(PddfThermal):
         else:
             return None
 
-    def get_high_threshold(self):
-        return self.__try_get_threshold('high_err')
-
-    def get_low_threshold(self):
-        return self.__try_get_threshold('low_err')
-
     def get_high_critical_threshold(self):
         return self.__try_get_threshold('high_crit')
 
     def get_low_critical_threshold(self):
         return self.__try_get_threshold('low_crit')
+
+    def get_high_threshold(self):
+        return self.__try_get_threshold('high_err')
+
+    def get_low_threshold(self):
+        return self.__try_get_threshold('low_err')
 
     def get_high_warning_threshold(self):
         return self.__try_get_threshold('high_warn')
