@@ -328,10 +328,10 @@ class device_monitor(object):
 
         fan_dir = platform_chassis.get_fan(1).get_direction()
 
-        if fan_dir == "INTAKE":  # AFI
+        if fan_dir == "intake":  # AFI
             fan_thermal_spec = afi_thermal_spec
             fan_policy = fan_policy_b2f
-        elif fan_dir == "EXHAUST":          # AFO
+        elif fan_dir == "exhaust":          # AFO
             fan_thermal_spec = afo_thermal_spec
             fan_policy = fan_policy_f2b
         else:
@@ -358,7 +358,7 @@ class device_monitor(object):
         ori_state = fan_policy_state
         current_state = fan_policy_state
 
-        if fan_dir == "INTAKE":  # AFI
+        if fan_dir == "intake":  # AFI
             for i in range(THERMAL_NUM_MAX):
                 if ori_state == LEVEL_FAN_MID:
                     if thermal_val[i] >= fan_thermal_spec["mid_to_max_temp"][i]:

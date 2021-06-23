@@ -162,7 +162,7 @@ class device_monitor(object):
         }
         
         fan_dir= platform_chassis.get_fan(0).get_direction()
-        if fan_dir == 'EXHAUST':
+        if fan_dir == 'exhaust':
             fan_policy = fan_policy_f2b
         else:
             fan_policy = fan_policy_b2f
