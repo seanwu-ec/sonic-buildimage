@@ -10,7 +10,7 @@ except ImportError as e:
 
 def is_fan_dir_F2B():
     fan = sonic_platform.platform.Platform().get_chassis().get_fan(0)
-    return fan.get_direction() == fan.FAN_DIRECTION_EXHAUST
+    return fan.get_direction().lower() == fan.FAN_DIRECTION_EXHAUST
 
 
 class Threshold():
@@ -84,19 +84,3 @@ class Thermal(PddfThermal):
 
     def get_low_warning_threshold(self):
         return self.__try_get_threshold('low_warn')
-
-
-# def dump_all_thresholds():
-#     chassis = sonic_platform.platform.Platform().get_chassis()
-#     print('Dump thermal thresholds:')
-#     for index, thermal in enumerate(chassis.get_all_thermals()):
-#         high_crit = thermal.get_high_critical_threshold()
-#         high_err = thermal.get_high_threshold()
-#         high_warn = thermal.get_high_warning_threshold()
-#         low_warn = thermal.get_low_warning_threshold()
-#         low_err = thermal.get_low_threshold()
-#         low_crit = thermal.get_low_critical_threshold()
-#         print(f'{index}:{{h_c={high_crit}, h_e={high_err}, h_w={high_warn}, l_w={low_warn}, l_e={low_err}, l_c={low_crit} }}')
-
-# if __name__ == '__main__':
-#     dump_all_thresholds()
