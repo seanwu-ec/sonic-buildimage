@@ -275,12 +275,12 @@
      "TEMP1" :
     {
         "dev_info": { "device_type":"TEMP_SENSOR", "device_name":"TEMP1", "device_parent":"MUX2"},
+        "dev_attr": { "display_name":"Main Board 0x48"},
         "i2c":
         {
             "topo_info": { "parent_bus":"0xf", "dev_addr":"0x48", "dev_type":"lm75"},
             "attr_list":
             [
-                { "attr_name": "temp1_high_threshold", "drv_attr_name":"temp1_max"},
                 { "attr_name": "temp1_max_hyst"},
                 { "attr_name": "temp1_input"}
             ]
@@ -289,12 +289,12 @@
      "TEMP2" :
     {
         "dev_info": { "device_type":"TEMP_SENSOR", "device_name":"TEMP1", "device_parent":"MUX2"},
+        "dev_attr": { "display_name":"Main Board 0x49"},
         "i2c":
         {
             "topo_info": { "parent_bus":"0xf", "dev_addr":"0x49", "dev_type":"lm75"},
             "attr_list":
             [
-                { "attr_name": "temp1_high_threshold", "drv_attr_name":"temp1_max"},
                 { "attr_name": "temp1_max_hyst"},
                 { "attr_name": "temp1_input"}
             ]
@@ -303,12 +303,12 @@
      "TEMP3" :
     {
         "dev_info": { "device_type":"TEMP_SENSOR", "device_name":"TEMP1", "device_parent":"MUX2"},
+        "dev_attr": { "display_name":"Main Board 0x4A"},
         "i2c":
         {
             "topo_info": { "parent_bus":"0xf", "dev_addr":"0x4A", "dev_type":"lm75"},
             "attr_list":
             [
-                { "attr_name": "temp1_high_threshold", "drv_attr_name":"temp1_max"},
                 { "attr_name": "temp1_max_hyst"},
                 { "attr_name": "temp1_input"}
             ]
@@ -317,12 +317,12 @@
     "TEMP4" :
     {
         "dev_info": { "device_type":"TEMP_SENSOR", "device_name":"TEMP1", "device_parent":"MUX2"},
+        "dev_attr": { "display_name":"CPU Board 0x4B"},
         "i2c":
         {
             "topo_info": { "parent_bus":"0xf", "dev_addr":"0x4B", "dev_type":"lm75"},
             "attr_list":
             [
-                { "attr_name": "temp1_high_threshold", "drv_attr_name":"temp1_max"},
                 { "attr_name": "temp1_max_hyst"},
                 { "attr_name": "temp1_input"}
             ]
