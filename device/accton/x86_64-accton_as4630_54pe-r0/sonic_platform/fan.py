@@ -36,7 +36,8 @@ FANLED_MODES = {
     "1": FanBase.STATUS_LED_COLOR_GREEN,
     "2": FanBase.STATUS_LED_COLOR_AMBER
 }
-
+FAN_NAME_LIST = ["FAN-1F", "FAN-1R", "FAN-2F", "FAN-2R",
+                 "FAN-3F", "FAN-3R"]
 
 class Fan(FanBase):
     """Platform-specific Fan class"""
@@ -192,10 +193,10 @@ class Fan(FanBase):
             Returns:
             string: The name of the device
         """
-        if not self.is_psu_fan:
-            fan_name = "FAN-{}".format(self.fan_tray_index+1)
-        else:
-            fan_name = "PSU-{} FAN-{}".format(self.psu_index+1, self.fan_index+1)
+        fan_name = FAN_NAME_LIST[self.fan_tray_index*2 + self.fan_index] \
+            if not self.is_psu_fan \
+            else "PSU-{} FAN-{}".format(self.psu_index+1, self.fan_index+1)
+
         return fan_name
             
     def get_presence(self):
