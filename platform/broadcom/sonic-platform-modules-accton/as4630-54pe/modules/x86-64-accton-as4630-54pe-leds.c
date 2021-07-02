@@ -74,10 +74,10 @@ static struct accton_as4630_54pe_led_data  *ledctl = NULL;
 #define LED_MODE_STK2_GREEN_VALUE       0x0
 #define LED_MODE_STK2_OFF_VALUE	        0x10
 
-#define LED_TYPE_FAN_REG_MASK           (0x20|0x10)
-#define LED_MODE_FAN_AMBER_VALUE        0x20
-#define LED_MODE_FAN_GREEN_VALUE        0x10
-#define LED_MODE_FAN_OFF_VALUE	        (0x0)
+#define LED_TYPE_FAN_REG_MASK           (0x8|0x4)
+#define LED_MODE_FAN_AMBER_VALUE        0x8
+#define LED_MODE_FAN_GREEN_VALUE        0x4
+#define LED_MODE_FAN_OFF_VALUE	        (0xC)
 
 #define LED_TYPE_PSU2_REG_MASK          (0x8|0x4)
 #define LED_MODE_PSU2_AMBER_VALUE        0x8
@@ -371,7 +371,7 @@ static void accton_as4630_54pe_led_fan_set(struct led_classdev *led_cdev,
 static enum led_brightness accton_as4630_54pe_led_fan_get(struct led_classdev *cdev)
 {
     accton_as4630_54pe_led_update();
-    return led_reg_val_to_light_mode(LED_TYPE_FAN, ledctl->reg_val[0]);
+    return led_reg_val_to_light_mode(LED_TYPE_FAN, ledctl->reg_val[1]);
 }
 
 static void accton_as4630_54pe_led_psu1_set(struct led_classdev *led_cdev,
@@ -405,7 +405,7 @@ static struct led_classdev accton_as4630_54pe_leds[] = {
         .brightness_set	 = accton_as4630_54pe_led_diag_set,
         .brightness_get	 = accton_as4630_54pe_led_diag_get,
         .flags			 = LED_CORE_SUSPENDRESUME,
-        .max_brightness	 = LED_MODE_GREEN,
+        .max_brightness	 = LED_MODE_GREEN_BLINK,
     },
     [LED_TYPE_PRI] = {
         .name			 = "pri",

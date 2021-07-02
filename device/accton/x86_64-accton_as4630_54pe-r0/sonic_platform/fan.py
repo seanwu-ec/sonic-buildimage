@@ -10,11 +10,13 @@
 
 try:
     from sonic_platform_base.fan_base import FanBase
+    from sonic_platform_base.fan_drawer_base import FanDrawerBase
     from .helper import APIHelper
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
 PSU_FAN_MAX_RPM = 26688
+FAN_MAX_RPM = 13000
 
 CPLD_I2C_PATH = "/sys/bus/i2c/devices/3-0060/fan_"
 PSU_HWMON_I2C_PATH ="/sys/bus/i2c/devices/{}-00{}/"
@@ -28,9 +30,13 @@ PSU_I2C_MAPPING = {
         "addr": "59"
     },
 }
+FANLED_FNODE = "/sys/class/leds/fan/brightness"
+FANLED_MODES = {
+    "0": FanBase.STATUS_LED_COLOR_OFF,
+    "1": FanBase.STATUS_LED_COLOR_GREEN,
+    "2": FanBase.STATUS_LED_COLOR_AMBER
+}
 
-FAN_NAME_LIST = ["FAN-1F", "FAN-1R", "FAN-2F", "FAN-2R",
-                 "FAN-3F", "FAN-3R"]
 
 class Fan(FanBase):
     """Platform-specific Fan class"""
@@ -95,16 +101,19 @@ class Fan(FanBase):
             psu_fan_path= "{}{}".format(self.psu_hwmon_path, 'psu_fan1_speed_rpm')
             fan_speed_rpm = self._api_helper.read_txt_file(psu_fan_path)
             if fan_speed_rpm is not None:
-                speed = (int(fan_speed_rpm,10))*100/26688
+                speed = (int(fan_speed_rpm,10))*100/PSU_FAN_MAX_RPM
                 if speed > 100:
                     speed=100
             else:
                 return 0
         elif self.get_presence():            
-            speed_path = "{}{}".format(CPLD_I2C_PATH, 'duty_cycle_percentage')
-            speed=self._api_helper.read_txt_file(speed_path)
-            if speed is None:
+            speed_path = "{}{}{}".format(CPLD_I2C_PATH, 'speed_rpm_', self.fan_tray_index+1)
+            speed_rpm=self._api_helper.read_txt_file(speed_path)
+            if speed_rpm is None:
                 return 0
+            else:
+                speed_rpm = int(speed_rpm)
+                speed = speed_rpm*100/FAN_MAX_RPM if speed_rpm < FAN_MAX_RPM else 100
         return int(speed)
             
     def get_target_speed(self):
@@ -120,7 +129,14 @@ class Fan(FanBase):
             0   : when PWM mode is use
             pwm : when pwm mode is not use
         """
-        return False #Not supported
+        if self.is_psu_fan:
+            raise NotImplementedError
+        if not self.get_presence():
+            return 0
+
+        speed_path = "{}{}".format(CPLD_I2C_PATH, 'duty_cycle_percentage')
+        speed = self._api_helper.read_txt_file(speed_path)
+        return int(speed) if speed is not None else 0
 
     def get_speed_tolerance(self):
         """
@@ -129,7 +145,7 @@ class Fan(FanBase):
             An integer, the percentage of variance from target speed which is
                  considered tolerable
         """
-        return False #Not supported
+        return 80
 
     def set_speed(self, speed):
         """
@@ -165,14 +181,10 @@ class Fan(FanBase):
         Returns:
             A string, one of the predefined STATUS_LED_COLOR_* strings above
         """
-        status=self.get_presence()
-        if status is None:
-            return  self.STATUS_LED_COLOR_OFF
-
-        return {
-            1: self.STATUS_LED_COLOR_GREEN,
-            0: self.STATUS_LED_COLOR_RED            
-        }.get(status, self.STATUS_LED_COLOR_OFF)
+        if self.is_psu_fan:
+            raise NotImplementedError
+        read_val=self._api_helper.read_txt_file(FANLED_FNODE)
+        return FANLED_MODES[read_val] if read_val in FANLED_MODES else "unknown"
 
     def get_name(self):
         """
@@ -180,10 +192,10 @@ class Fan(FanBase):
             Returns:
             string: The name of the device
         """
-        fan_name = FAN_NAME_LIST[self.fan_tray_index*2 + self.fan_index] \
-            if not self.is_psu_fan \
-            else "PSU-{} FAN-{}".format(self.psu_index+1, self.fan_index+1)
-
+        if not self.is_psu_fan:
+            fan_name = "FAN-{}".format(self.fan_tray_index+1)
+        else:
+            fan_name = "PSU-{} FAN-{}".format(self.psu_index+1, self.fan_index+1)
         return fan_name
             
     def get_presence(self):
@@ -240,3 +252,7 @@ class Fan(FanBase):
             string: Serial number of device
         """
         return "N/A"
+
+
+class FanDrawer(FanDrawerBase):
+    pass
