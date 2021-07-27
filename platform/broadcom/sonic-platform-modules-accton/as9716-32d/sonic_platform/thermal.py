@@ -2,33 +2,19 @@
 
 
 try:
-    import sonic_platform
+    from collections import namedtuple
     from sonic_platform_pddf_base.pddf_thermal import PddfThermal
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
 
+Threshold = namedtuple('Threshold', ['high_crit', 'high_err', 'high_warn',
+                       'low_warn', 'low_err', 'low_crit'], defaults=[0]*6)
+
 def is_fan_dir_F2B():
-    fan = sonic_platform.platform.Platform().get_chassis().get_fan(0)
-    return fan.get_direction() == fan.FAN_DIRECTION_EXHAUST
-
-
-class Threshold():
-    def __init__(self, high_crit, high_err, high_warn, low_warn=0, low_err=None, low_crit=None):
-        self.__data = {
-            'high_crit' : high_crit,
-            'high_err' : high_err,
-            'high_warn' : high_warn,
-            'low_warn' : low_warn,
-            'low_err' : low_err,
-            'low_crit' : low_crit
-        }
-
-    def __getitem__(self, key):
-        if key in self.__data:
-            return self.__data[key]
-        else:
-            return None
+    from sonic_platform.platform import Platform
+    fan = Platform().get_chassis().get_fan(0)
+    return fan.get_direction().lower() == fan.FAN_DIRECTION_EXHAUST
 
 
 class Thermal(PddfThermal):
@@ -65,7 +51,7 @@ class Thermal(PddfThermal):
             self.__thresholds = self.__thresholds_F2B if is_fan_dir_F2B() else self.__thresholds_B2F
 
         if self.__index in self.__thresholds:
-            return self.__thresholds[self.__index][type]
+            return getattr(self.__thresholds[self.__index], type)
         else:
             return None
 

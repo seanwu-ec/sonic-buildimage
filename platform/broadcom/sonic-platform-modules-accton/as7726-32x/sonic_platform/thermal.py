@@ -2,21 +2,25 @@
 
 
 try:
+    from collections import namedtuple
     from sonic_platform_pddf_base.pddf_thermal import PddfThermal
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
+
+Threshold = namedtuple('Threshold', ['high_crit', 'high_err', 'high_warn',
+                       'low_warn', 'low_err', 'low_crit'], defaults=[0]*6)
 
 
 class Thermal(PddfThermal):
     """PDDF Platform-Specific Thermal class"""
 
     __thresholds = {
-        0: {'crit_high': 80.0, 'high':  60.0, 'low': 0.0, 'crit_low': -20.0},
-        1: {'crit_high': 81.0, 'high':  61.0, 'low': 1.0, 'crit_low': -21.0},
-        2: {'crit_high': 82.0, 'high':  62.0, 'low': 2.0, 'crit_low': -22.0},
-        3: {'crit_high': 83.0, 'high':  63.0, 'low': 3.0, 'crit_low': -23.0},
-        4: {'crit_high': 84.0, 'high':  64.0, 'low': 4.0, 'crit_low': -24.0},
+        0: Threshold(80.0, 70.0, 60.0, 0.0, -10.0, -20.0),
+        1: Threshold(81.0, 71.0, 61.0, 1.0, -11.0, -21.0),
+        2: Threshold(82.0, 72.0, 62.0, 2.0, -12.0, -22.0),
+        3: Threshold(83.0, 73.0, 63.0, 3.0, -13.0, -23.0),
+        4: Threshold(84.0, 74.0, 64.0, 4.0, -14.0, -24.0)
     }
 
     def __init__(self, index, pddf_data=None, pddf_plugin_data=None):
@@ -27,18 +31,24 @@ class Thermal(PddfThermal):
 
     def __try_get_threshold(self, type):
         if self.__index in self.__thresholds:
-            return self.__thresholds[self.__index][type]
+            return getattr(self.__thresholds[self.__index], type)
         else:
             return None
 
-    def get_high_threshold(self):
-        return self.__try_get_threshold('high')
-
-    def get_low_threshold(self):
-        return self.__try_get_threshold('low')
-
     def get_high_critical_threshold(self):
-        return self.__try_get_threshold('crit_high')
+        return self.__try_get_threshold('high_crit')
 
     def get_low_critical_threshold(self):
-        return self.__try_get_threshold('crit_low')
+        return self.__try_get_threshold('low_crit')
+
+    def get_high_threshold(self):
+        return self.__try_get_threshold('high_err')
+
+    def get_low_threshold(self):
+        return self.__try_get_threshold('low_err')
+
+    def get_high_warning_threshold(self):
+        return self.__try_get_threshold('high_warn')
+
+    def get_low_warning_threshold(self):
+        return self.__try_get_threshold('low_warn')

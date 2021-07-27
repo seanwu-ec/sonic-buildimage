@@ -9,35 +9,20 @@
 import os
 import os.path
 import glob
+from collections import namedtuple
 
 try:
-    import sonic_platform
     from sonic_platform_base.thermal_base import ThermalBase
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
+Threshold = namedtuple('Threshold', ['high_crit', 'high_err', 'high_warn',
+                       'low_warn', 'low_err', 'low_crit'], defaults=[0]*6)
 
 def is_fan_dir_F2B():
-    fan = sonic_platform.platform.Platform().get_chassis().get_fan(0)
+    from sonic_platform.platform import Platform
+    fan = Platform().get_chassis().get_fan(0)
     return fan.get_direction().lower() == fan.FAN_DIRECTION_EXHAUST
-
-
-class Threshold():
-    def __init__(self, high_crit, high_err, high_warn, low_warn=0, low_err=None, low_crit=None):
-        self.__data = {
-            'high_crit' : high_crit,
-            'high_err' : high_err,
-            'high_warn' : high_warn,
-            'low_warn' : low_warn,
-            'low_err' : low_err,
-            'low_crit' : low_crit
-        }
-
-    def __getitem__(self, key):
-        if key in self.__data:
-            return self.__data[key]
-        else:
-            return None
 
 
 class Thermal(ThermalBase):
@@ -52,16 +37,16 @@ class Thermal(ThermalBase):
     SYSFS_PATH = "/sys/bus/i2c/devices"
 
     THRESHOLDS_F2B = {
-        0: Threshold(78.0, 75.5, 73.0),
-        1: Threshold(72.0, 69.5, 67.0),
-        2: Threshold(66.0, 63.5, 61.0),
-        3: Threshold(71.0, 68.5, 66.0),
+        0: Threshold(78.0, 73.0, 73.0),
+        1: Threshold(72.0, 67.0, 67.0),
+        2: Threshold(66.0, 61.0, 61.0),
+        3: Threshold(71.0, 66.0, 66.0),
     }
     THRESHOLDS_B2F = {
-        0: Threshold(67.0, 64.5, 62.0),
-        1: Threshold(75.0, 72.5, 70.0),
-        2: Threshold(68.0, 65.5, 63.0),
-        3: Threshold(68.0, 65.5, 63.0),
+        0: Threshold(67.0, 62.0, 62.0),
+        1: Threshold(75.0, 70.0, 70.0),
+        2: Threshold(68.0, 63.0, 63.0),
+        3: Threshold(68.0, 63.0, 63.0),
     }
     THRESHOLDS = None
 
@@ -105,7 +90,7 @@ class Thermal(ThermalBase):
             self.THRESHOLDS = self.THRESHOLDS_F2B if is_fan_dir_F2B() else self.THRESHOLDS_B2F
 
         if self.index in self.THRESHOLDS:
-            return self.THRESHOLDS[self.index][type]
+            return getattr(self.THRESHOLDS[self.index], type)
         else:
             return None
 

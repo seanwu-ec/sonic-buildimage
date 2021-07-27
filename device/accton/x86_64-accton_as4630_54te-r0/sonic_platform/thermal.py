@@ -9,38 +9,26 @@
 import os
 import os.path
 import glob
+from collections import namedtuple
 
 try:
     from sonic_platform_base.thermal_base import ThermalBase
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
+Threshold = namedtuple('Threshold', ['high_crit', 'high_err', 'high_warn',
+                       'low_warn', 'low_err', 'low_crit'], defaults=[0]*6)
 
-class Threshold():
-    def __init__(self, high_crit, high_err, high_warn, low_warn=0, low_err=None, low_crit=None):
-        self.__data = {
-            'high_crit' : high_crit,
-            'high_err' : high_err,
-            'high_warn' : high_warn,
-            'low_warn' : low_warn,
-            'low_err' : low_err,
-            'low_crit' : low_crit
-        }
 
-    def __getitem__(self, key):
-        if key in self.__data:
-            return self.__data[key]
-        else:
-            return None
 
 
 class Thermal(ThermalBase):
     """Platform-specific Thermal class"""
 
     THERMAL_NAME_LIST = (
-        'Main Board 0x48',
-        'CPU Board 0x4B',
-        'Fan Board 0x4A'
+        "Main Board 0x48",
+        "CPU Board 0x4B",
+        "Fan Board 0x4A"
     )
     SYSFS_PATH = "/sys/bus/i2c/devices"
     THRESHOLDS = {
@@ -85,7 +73,7 @@ class Thermal(ThermalBase):
 
     def __try_get_threshold(self, type):
         if self.index in self.THRESHOLDS:
-            return self.THRESHOLDS[self.index][type]
+            return getattr(self.THRESHOLDS[self.index], type)
         else:
             return None
 
@@ -153,19 +141,3 @@ class Thermal(ThermalBase):
 
     def get_low_warning_threshold(self):
         return self.__try_get_threshold('low_warn')
-
-
-def dump_all_thresholds():
-    chassis = sonic_platform.platform.Platform().get_chassis()
-    print('Dump thermal thresholds:')
-    for index, thermal in enumerate(chassis.get_all_thermals()):
-        high_crit = thermal.get_high_critical_threshold()
-        high_err = thermal.get_high_threshold()
-        high_warn = thermal.get_high_warning_threshold()
-        low_warn = thermal.get_low_warning_threshold()
-        low_err = thermal.get_low_threshold()
-        low_crit = thermal.get_low_critical_threshold()
-        print(f'{index}:{{h_c={high_crit}, h_e={high_err}, h_w={high_warn}, l_w={low_warn}, l_e={low_err}, l_c={low_crit} }}')
-
-if __name__ == '__main__':
-    dump_all_thresholds()
