@@ -20,7 +20,7 @@ def is_fan_dir_F2B():
 class Thermal(PddfThermal):
     """PDDF Platform-Specific Thermal class"""
 
-    __thresholds_F2B = {
+    _thresholds_F2B = {
         0: Threshold(59.0, 56.0, 53.0),
         1: Threshold(60.0, 57.0, 54.0),
         2: Threshold(70.25, 68.625, 67.0),
@@ -28,7 +28,7 @@ class Thermal(PddfThermal):
         4: Threshold(56.0, 55.5, 55.0),
         5: Threshold(55.75, 54.875, 54.0)
     }
-    __thresholds_B2F = {
+    _thresholds_B2F = {
         0: Threshold(52.0, 49.5, 47.0),
         1: Threshold(51.0, 49.0, 47.0),
         2: Threshold(71.0, 68.5, 66.0),
@@ -36,37 +36,37 @@ class Thermal(PddfThermal):
         4: Threshold(55.0, 53.0, 51.0),
         5: Threshold(50.5, 48.75, 47.0)
     }
-    __thresholds = None
+    _thresholds = None
 
     def __init__(self, index, pddf_data=None, pddf_plugin_data=None):
         PddfThermal.__init__(self, index, pddf_data, pddf_plugin_data)
-        self.__index = index
+        self._index = index
 
     # Provide the functions/variables below for which implementation is to be overwritten
 
-    def __try_get_threshold(self, type):
-        if self.__thresholds is None:
-            self.__thresholds = self.__thresholds_F2B if is_fan_dir_F2B() else self.__thresholds_B2F
+    def _try_get_threshold(self, type):
+        if self._thresholds is None:
+            self._thresholds = self._thresholds_F2B if is_fan_dir_F2B() else self._thresholds_B2F
 
-        if self.__index in self.__thresholds:
-            return getattr(self.__thresholds[self.__index], type)
+        if self._index in self._thresholds:
+            return getattr(self._thresholds[self._index], type)
         else:
             return None
 
     def get_high_critical_threshold(self):
-        return self.__try_get_threshold('high_crit')
+        return self._try_get_threshold('high_crit')
 
     def get_low_critical_threshold(self):
-        return self.__try_get_threshold('low_crit')
+        return self._try_get_threshold('low_crit')
 
     def get_high_threshold(self):
-        return self.__try_get_threshold('high_err')
+        return self._try_get_threshold('high_err')
 
     def get_low_threshold(self):
-        return self.__try_get_threshold('low_err')
+        return self._try_get_threshold('low_err')
 
     def get_high_warning_threshold(self):
-        return self.__try_get_threshold('high_warn')
+        return self._try_get_threshold('high_warn')
 
     def get_low_warning_threshold(self):
-        return self.__try_get_threshold('low_warn')
+        return self._try_get_threshold('low_warn')
