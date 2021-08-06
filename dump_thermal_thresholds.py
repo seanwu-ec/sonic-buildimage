@@ -67,6 +67,9 @@ def dump_thermal_thresholds_api2():
         high_warn = thermal.get_high_warning_threshold()
         low_warn = thermal.get_low_warning_threshold()
 
+        if high_crit==None and high_err==None and high_warn==None and low_warn==None:
+            continue
+
         output[str(index + 1)] = {
             "error": int(high_err*1000),
             "shutdown": int(high_crit*1000),
@@ -83,6 +86,9 @@ def dump_thermal_thresholds_api1():
         high_err = thermalutil.get_high_threshold(i)
         high_warn = thermalutil.get_high_warning_threshold(i)
         low_warn = thermalutil.get_low_warning_threshold(i)
+
+        if high_crit==None and high_err==None and high_warn==None and low_warn==None:
+            continue
 
         output[str(i)] = {
             "error": int(high_err*1000),
