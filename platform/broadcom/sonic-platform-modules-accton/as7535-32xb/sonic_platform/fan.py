@@ -14,6 +14,7 @@ except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
 
 PSU_FAN_MAX_RPM = 25500
+SPEED_TOLERANCE = 15
 
 CPLD_I2C_PATH = "/sys/devices/platform/as7535_32xb_fan/fan"
 PSU_HWMON_I2C_PATH ="/sys/devices/platform/as7535_32xb_psu/psu{}"
@@ -55,7 +56,7 @@ class Fan(FanBase):
                 direction = self.FAN_DIRECTION_EXHAUST
 
         else: #For PSU
-            dir_str = "{}{}".format(self.psu_hwmon_path,'psu_fan_dir')
+            dir_str = "{}{}".format(self.psu_hwmon_path,'_fan_dir')
 
             val=self._api_helper.read_txt_file(dir_str)
 
@@ -109,7 +110,7 @@ class Fan(FanBase):
             0   : when PWM mode is use
             pwm : when pwm mode is not use
         """
-        return False #Not supported
+        return self.get_speed()
 
     def get_speed_tolerance(self):
         """
@@ -118,7 +119,7 @@ class Fan(FanBase):
             An integer, the percentage of variance from target speed which is
                  considered tolerable
         """
-        return False #Not supported
+        return SPEED_TOLERANCE
 
     def set_speed(self, speed):
         """
@@ -181,10 +182,9 @@ class Fan(FanBase):
         Returns:
             bool: True if FAN is present, False if not
         """
-        present_path = "{}{}{}".format(CPLD_I2C_PATH, self.fan_tray_index+1, '_present')
-        val=self._api_helper.read_txt_file(present_path)
-
         if not self.is_psu_fan:
+            present_path = "{}{}{}".format(CPLD_I2C_PATH, self.fan_tray_index+1, '_present')
+            val=self._api_helper.read_txt_file(present_path)
             if val is not None:
                 return int(val, 10)==1
             else:
@@ -198,21 +198,7 @@ class Fan(FanBase):
         Returns:
             A boolean value, True if device is operating properly, False if not
         """
-        if self.is_psu_fan:
-            psu_fan_path= "{}{}".format(self.psu_hwmon_path, 'psu_fan1_fault')
-            val=self._api_helper.read_txt_file(psu_fan_path)
-            if val is not None:
-                return int(val, 10)==0
-            else:
-                return False
-        else:
-            path = "{}{}{}".format(CPLD_I2C_PATH, self.fan_tray_index+1, '_fault')
-            val=self._api_helper.read_txt_file(path)
-            if val is not None:
-                return int(val, 10)==0
-            else:
-                return False
-
+        return self.get_presence()
 
     def get_model(self):
         """

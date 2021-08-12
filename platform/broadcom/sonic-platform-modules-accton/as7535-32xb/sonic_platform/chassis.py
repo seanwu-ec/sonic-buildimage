@@ -29,7 +29,13 @@ PMON_REBOOT_CAUSE_PATH = "/usr/share/sonic/platform/api_files/reboot-cause/"
 REBOOT_CAUSE_FILE = "reboot-cause.txt"
 PREV_REBOOT_CAUSE_FILE = "previous-reboot-cause.txt"
 HOST_CHK_CMD = "docker > /dev/null 2>&1"
+SYSLED_FNODE= "/sys/devices/platform/as7535_32xb_led/led_diag"
 
+SYSLED_MODES = {
+    "12" : "STATUS_LED_COLOR_ORANGE",
+    "16" : "STATUS_LED_COLOR_GREEN",
+    "17" : "STATUS_LED_COLOR_GREEN_BLINK"
+}
 
 class Chassis(ChassisBase):
     """Platform-specific Chassis class"""
@@ -233,3 +239,21 @@ class Chassis(ChassisBase):
             sys.stderr.write("SFP index {} out of range (1-{})\n".format(
                              index, len(self._sfp_list)))
         return sfp
+
+    def initizalize_system_led(self):
+        return True
+
+    def get_status_led(self):
+        val = self._api_helper.read_txt_file(SYSLED_FNODE)
+        return SYSLED_MODES[val] if val in SYSLED_MODES else "UNKNOWN"
+
+    def set_status_led(self, color):
+        mode = None
+        for key, val in SYSLED_MODES.items():
+            if val == color:
+                mode = key
+                break
+        if mode is None:
+            return False
+        else:
+            return self._api_helper.write_txt_file(SYSLED_FNODE, mode)

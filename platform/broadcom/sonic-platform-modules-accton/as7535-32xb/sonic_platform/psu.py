@@ -142,7 +142,7 @@ class Psu(PsuBase):
             A float number, the high threshold output voltage in volts,
             e.g. 12.1
         """
-        return 0
+        return None
 
     def get_voltage_low_threshold(self):
         """
@@ -151,7 +151,7 @@ class Psu(PsuBase):
             A float number, the low threshold output voltage in volts,
             e.g. 12.1
         """
-        return 0
+        return None
 
     def get_name(self):
         """
