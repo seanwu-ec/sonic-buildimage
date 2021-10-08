@@ -278,7 +278,7 @@ class Sfp(SfpBase):
     # Path to sysfs
     PLATFORM_ROOT_PATH = "/usr/share/sonic/device"
     PMON_HWSKU_PATH = "/usr/share/sonic/hwsku"
-    HOST_CHK_CMD = "docker > /dev/null 2>&1"
+    HOST_CHK_CMD = "which systemctl > /dev/null 2>&1"
     PLATFORM = "x86_64-accton_as5812_54x-r0"
     HWSKU = "Accton-AS5812-54X"
 
