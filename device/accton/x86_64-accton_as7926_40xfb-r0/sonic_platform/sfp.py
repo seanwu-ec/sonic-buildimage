@@ -273,7 +273,7 @@ I2C_EEPROM_PATH = '/sys/bus/i2c/devices/{0}-0050/eeprom'
 
 class Sfp(SfpBase):
     """Platform-specific Sfp class"""
-    HOST_CHK_CMD = "docker > /dev/null 2>&1"
+    HOST_CHK_CMD = "which systemctl > /dev/null 2>&1"
     PLATFORM = "x86_64-accton_as7926_40xfb-r0"
     HWSKU = "Accton-AS7926-40XFB"
 
