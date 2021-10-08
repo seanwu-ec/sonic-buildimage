@@ -1,6 +1,5 @@
 try:
     import time
-    from .helper import APIHelper
     from sonic_py_common.logger import Logger
 except ImportError as e:
     raise ImportError(repr(e) + " - required module not found")
@@ -11,7 +10,6 @@ class SfpEvent:
     ''' Listen to insert/remove sfp events '''
 
     def __init__(self, sfp_list):
-        self._api_helper = APIHelper()
         self._sfp_list = sfp_list
         self._logger = Logger()
         self._sfp_change_event_data = {'present': 0}
@@ -20,7 +18,7 @@ class SfpEvent:
         bitmap = 0
         for sfp in self._sfp_list:
             modpres = sfp.get_presence()
-            i=sfp.port_num-1
+            i=sfp.get_position_in_parent() - 1
             if modpres:
                 bitmap = bitmap | (1 << i)
         return bitmap
@@ -47,7 +45,7 @@ class SfpEvent:
 
         if changed_ports != 0:
             for sfp in self._sfp_list:
-                i=sfp.port_num-1
+                i=sfp.get_position_in_parent() - 1
                 if (changed_ports & (1 << i)):
                     if (bitmap & (1 << i)) == 0:
                         port_dict[i+1] = '0'
