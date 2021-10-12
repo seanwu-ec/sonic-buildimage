@@ -27,7 +27,7 @@ HOST_REBOOT_CAUSE_PATH = "/host/reboot-cause/"
 PMON_REBOOT_CAUSE_PATH = "/usr/share/sonic/platform/api_files/reboot-cause/"
 REBOOT_CAUSE_FILE = "reboot-cause.txt"
 PREV_REBOOT_CAUSE_FILE = "previous-reboot-cause.txt"
-HOST_CHK_CMD = "docker > /dev/null 2>&1"
+HOST_CHK_CMD = "which systemctl > /dev/null 2>&1"
 SYSLED_FNODE= "/sys/class/leds/accton_as7326_56x_led::diag/brightness"
 SYSLED_MODES = {
     "0" : "STATUS_LED_COLOR_OFF",
@@ -57,6 +57,7 @@ class Chassis(ChassisBase):
         for index in range(NUM_PORT):
             sfp = Sfp(index)
             self._sfp_list.append(sfp)
+        self._sfpevent = SfpEvent(self._sfp_list)
         self.sfp_module_initialized = True
 
     def __initialize_fan(self):
@@ -202,10 +203,7 @@ class Chassis(ChassisBase):
         # SFP event
         if not self.sfp_module_initialized:
             self.__initialize_sfp()
-
-        status, sfp_event = SfpEvent(self._sfp_list).get_sfp_event(timeout)
-        
-        return status, sfp_event
+        return self._sfpevent.get_sfp_event(timeout)
 
     def get_sfp(self, index):
         """
