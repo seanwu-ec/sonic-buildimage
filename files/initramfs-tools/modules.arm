@@ -12,3 +12,14 @@ ofpart
 mtdswap
 mtd_blkdevs
 adt7475
+mtdblock
+mtdblock_ro
+mtdoops
+ahci
+sd_mod
+sr_mod
+ohci_pci
+ehci_pci
+loop
+ext4
+i2c-dev

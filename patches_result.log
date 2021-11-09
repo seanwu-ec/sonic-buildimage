@@ -1,0 +1,6 @@
+Tue Nov  9 02:57:03 UTC 2021
+INFO: sonic-buildimage ...
+CMD: cd .
+INFO: URL https://github.com/Marvell-OpenNOS//sonic-buildimage/pull/50.diff
+INFO: patch -p1 < 50.diff
+INFO: Applying patch

@@ -44,6 +44,11 @@ read_conf_file() {
 set -e
 cd $(dirname $0)
 
+START_TIME=`date +%s`
+echo 0 > /proc/sys/kernel/hung_task_timeout_secs
+sync
+echo 3 > /proc/sys/vm/drop_caches
+
 if [ -d "/etc/sonic" ]; then
     echo "Installing SONiC in SONiC"
     install_env="sonic"
@@ -185,6 +190,8 @@ if [ "$install_env" = "onie" ]; then
         exit 1
     fi
 fi
+sync
+echo 3 > /proc/sys/vm/drop_caches
 
 # Creates a new partition for the DEMO OS.
 #
@@ -278,6 +285,8 @@ create_demo_gpt_partition()
     ##   probably because it/they are in use.  As a result, the old partition(s) will remain in use.  You should reboot now
     ##   before making further changes.
     partprobe || true
+sync
+echo 3 > /proc/sys/vm/drop_caches
 }
 
 create_demo_msdos_partition()
@@ -340,6 +349,8 @@ create_demo_uefi_partition()
 # Install legacy BIOS GRUB for DEMO OS
 demo_install_grub()
 {
+sync
+echo 3 > /proc/sys/vm/drop_caches
     local demo_mnt="$1"
     local blk_dev="$2"
 
@@ -465,6 +476,8 @@ if [ "$install_env" = "onie" ]; then
         exit 1
     }
 
+sync
+echo 3 > /proc/sys/vm/drop_caches
 elif [ "$install_env" = "sonic" ]; then
     demo_mnt="/host"
     # Get current SONiC image (grub/aboot/uboot)
@@ -486,6 +499,8 @@ elif [ "$install_env" = "sonic" ]; then
             rm -rf $f
         fi
     done
+sync
+echo 3 > /proc/sys/vm/drop_caches
 else
     demo_mnt="build_raw_image_mnt"
     demo_dev=$cur_wd/"%%OUTPUT_RAW_IMAGE%%"
@@ -497,6 +512,8 @@ else
     mount -t auto -o loop $demo_dev $demo_mnt
 fi
 
+sync
+echo 3 > /proc/sys/vm/drop_caches
 echo "Installing SONiC to $demo_mnt/$image_dir"
 
 # Create target directory or clean it up if exists
@@ -517,6 +534,8 @@ if [ x"$docker_inram" = x"on" ]; then
 else
     unzip -o $ONIE_INSTALLER_PAYLOAD -x "$FILESYSTEM_DOCKERFS" -d $demo_mnt/$image_dir
 
+sync
+echo 3 > /proc/sys/vm/drop_caches
     if [ "$install_env" = "onie" ]; then
         TAR_EXTRA_OPTION="--numeric-owner"
     else
@@ -524,6 +543,8 @@ else
     fi
     mkdir -p $demo_mnt/$image_dir/$DOCKERFS_DIR
     unzip -op $ONIE_INSTALLER_PAYLOAD "$FILESYSTEM_DOCKERFS" | tar xz $TAR_EXTRA_OPTION -f - -C $demo_mnt/$image_dir/$DOCKERFS_DIR
+sync
+echo 3 > /proc/sys/vm/drop_caches
 fi
 
 if [ "$install_env" = "onie" ]; then
@@ -547,6 +568,8 @@ if [ "$install_env" = "onie" ]; then
     else
         demo_install_grub "$demo_mnt" "$blk_dev"
     fi
+sync
+echo 3 > /proc/sys/vm/drop_caches
 fi
 
 # Create a minimal grub.cfg that allows for:
@@ -661,6 +684,8 @@ menuentry '$demo_grub_entry' {
 }
 EOF
 
+sync
+echo 3 > /proc/sys/vm/drop_caches
 if [ "$install_env" = "onie" ]; then
     # Add menu entries for ONIE -- use the grub fragment provided by the
     # ONIE distribution.
@@ -683,3 +708,10 @@ fi
 cd /
 
 echo "Installed SONiC base image $demo_volume_label successfully"
+sync
+echo 3 > /proc/sys/vm/drop_caches
+echo 120 > /proc/sys/kernel/hung_task_timeout_secs
+END_TIME=`date +%s`
+DIFF_TIME=$(($START_TIME - $END_TIME))
+#TIME_TAKEN="$(( ${DIFF_TIME} / 3600 ))h $(( (${DIFF_TIME} / 60) % 60 ))m $(( ${DIFF_TIME} % 60 ))s"
+echo "INFO: Installation took ${DIFF_TIME} s"

@@ -11,8 +11,14 @@
 #
 # By default this script does nothing.
 
+        python /etc/ent.py &
 SONIC_VERSION=$(cat /etc/sonic/sonic_version.yml | grep "build_version" | sed -e "s/build_version: //g;s/'//g")
 FIRST_BOOT_FILE="/host/image-${SONIC_VERSION}/platform/firsttime"
+echo "Marvell: Executing Workarounds !!!!"
+
+echo "Switch Mac Address Update"
+MAC_ADDR=`ip link show eth0 | grep ether | awk '{print $2}'`
+find /usr/share/sonic/device/*db98cx* -name profile.ini | xargs sed -i "s/switchMacAddress=.*/switchMacAddress=$MAC_ADDR/g"
 
 # Move sonic-environment to /etc/sonic
 SONIC_CONFIG_DIR="/host/image-${SONIC_VERSION}/sonic-config"
