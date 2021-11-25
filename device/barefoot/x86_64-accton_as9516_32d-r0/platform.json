@@ -107,97 +107,100 @@
         ],
         "sfps": [
             {
-                "name": "Ethernet0"
+                "name": "sfp1"
             },
             {
-                "name": "Ethernet8"
+                "name": "sfp2"
             },
             {
-                "name": "Ethernet16"
+                "name": "sfp3"
             },
             {
-                "name": "Ethernet32"
+                "name": "sfp4"
             },
             {
-                "name": "Ethernet40"
+                "name": "sfp5"
             },
             {
-                "name": "Ethernet48"
+                "name": "sfp6"
             },
             {
-                "name": "Ethernet56"
+                "name": "sfp7"
             },
             {
-                "name": "Ethernet64"
+                "name": "sfp8"
             },
             {
-                "name": "Ethernet72"
+                "name": "sfp9"
             },
             {
-                "name": "Ethernet80"
+                "name": "sfp10"
             },
             {
-                "name": "Ethernet88"
+                "name": "sfp11"
             },
             {
-                "name": "Ethernet96"
+                "name": "sfp12"
             },
             {
-                "name": "Ethernet104"
+                "name": "sfp13"
             },
             {
-                "name": "Ethernet112"
+                "name": "sfp14"
             },
             {
-                "name": "Ethernet120"
+                "name": "sfp15"
             },
             {
-                "name": "Ethernet128"
+                "name": "sfp16"
             },
             {
-                "name": "Ethernet136"
+                "name": "sfp17"
             },
             {
-                "name": "Ethernet144"
+                "name": "sfp18"
             },
             {
-                "name": "Ethernet152"
+                "name": "sfp19"
             },
             {
-                "name": "Ethernet160"
+                "name": "sfp20"
             },
             {
-                "name": "Ethernet168"
+                "name": "sfp21"
             },
             {
-                "name": "Ethernet176"
+                "name": "sfp22"
             },
             {
-                "name": "Ethernet184"
+                "name": "sfp23"
             },
             {
-                "name": "Ethernet192"
+                "name": "sfp24"
             },
             {
-                "name": "Ethernet200"
+                "name": "sfp25"
             },
             {
-                "name": "Ethernet208"
+                "name": "sfp26"
             },
             {
-                "name": "Ethernet216"
+                "name": "sfp27"
             },
             {
-                "name": "Ethernet224"
+                "name": "sfp28"
             },
             {
-                "name": "Ethernet232"
+                "name": "sfp29"
             },
             {
-                "name": "Ethernet240"
+                "name": "sfp30"
             },
             {
-                "name": "Ethernet248"
+                "name": "sfp31"
+            },
+            {
+                "name": "sfp32"
             }
         ]
     },
