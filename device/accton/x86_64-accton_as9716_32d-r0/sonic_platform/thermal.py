@@ -11,9 +11,14 @@ import os.path
 import glob
 
 try:
+    from collections import namedtuple
     from sonic_platform_base.thermal_base import ThermalBase
 except ImportError as e:
     raise ImportError(str(e) + "- required module not found")
+
+
+Threshold = namedtuple('Threshold', ['high_crit', 'high_err', 'high_warn',
+                       'low_warn', 'low_err', 'low_crit'], defaults=[0]*6)
 
 PSU_I2C_PATH = "/sys/bus/i2c/devices/{}-00{}/"
 
@@ -39,16 +44,48 @@ PSU_CPLD_I2C_MAPPING = {
     }
 }
 
-THERMAL_NAME_LIST = ["Temp sensor 1", "Temp sensor 2", "Temp sensor 3", 
-                     "Temp sensor 4", "Temp sensor 5", "Temp sensor 6" ,
-                     "Temp sensor 7"]
+THERMAL_NAME_LIST = (
+    "Main Board 0x48",
+    "Main Board 0x49",
+    "Main Board 0x4A",
+    "CPU Board 0x4B",
+    "OXCO Board 0x4C",
+    "Fan Board 0x4E",
+    "Fan Board 0x4F"
+)
                      
 PSU_THERMAL_NAME_LIST = ["PSU-1 temp sensor 1", "PSU-2 temp sensor 1"]
 
 SYSFS_PATH = "/sys/bus/i2c/devices"
 
+def is_fan_dir_F2B():
+    from sonic_platform.platform import Platform
+    fan = Platform().get_chassis().get_fan(0)
+    return fan.get_direction().lower() == fan.FAN_DIRECTION_EXHAUST
+
+
 class Thermal(ThermalBase):
     """Platform-specific Thermal class"""
+
+    THRESHOLDS_F2B = {
+        0: Threshold(77.0, 72.0, 68.0),
+        1: Threshold(73.0, 68.0, 64.0),
+        2: Threshold(74.0, 69.0, 65.0),
+        3: Threshold(77.0, 72.0, 68.0),
+        4: Threshold(70.0, 65.0, 61.0),
+        5: Threshold(69.0, 64.0, 60.0),
+        6: Threshold(73.0, 68.0, 64.0)
+    }
+    THRESHOLDS_B2F = {
+        0: Threshold(75.0, 70.0, 66.0),
+        1: Threshold(65.0, 60.0, 56.0),
+        2: Threshold(63.0, 58.0, 54.0),
+        3: Threshold(52.0, 47.0, 43.0),
+        4: Threshold(63.0, 58.0, 54.0),
+        5: Threshold(58.0, 53.0, 49.0),
+        6: Threshold(60.0, 55.0, 51.0)
+    }
+    THRESHOLDS = None
 
     def __init__(self, thermal_index=0, is_psu=False, psu_index=0):
         self.index = thermal_index
@@ -101,20 +138,6 @@ class Thermal(ThermalBase):
         else:
             return 0        
 
-    def __set_threshold(self, file_name, temperature):
-        if self.is_psu:
-            return True
-        temp_file_path = os.path.join(self.hwmon_path, file_name)
-        for filename in glob.glob(temp_file_path):
-            try:
-                with open(filename, 'w') as fd:
-                    fd.write(str(temperature))
-                return True
-            except IOError as e:
-                print("IOError")
-                return False
-
-
     def get_temperature(self):
         """
         Retrieves current temperature reading from thermal
@@ -127,34 +150,6 @@ class Thermal(ThermalBase):
         else:
             temp_file = self.psu_hwmon_path + "psu_temp1_input"
         return self.__get_temp(temp_file)
-
-    def get_high_threshold(self):
-        """
-        Retrieves the high threshold temperature of thermal
-        Returns:
-            A float number, the high threshold temperature of thermal in Celsius
-            up to nearest thousandth of one degree Celsius, e.g. 30.125
-        """
-        if self.is_psu:
-            return 80
-
-        temp_file = "temp{}_max".format(self.ss_index)
-        return self.__get_temp(temp_file)
-
-    def set_high_threshold(self, temperature):
-        """
-        Sets the high threshold temperature of thermal
-        Args :
-            temperature: A float number up to nearest thousandth of one degree Celsius,
-            e.g. 30.125
-        Returns:
-            A boolean, True if threshold is set successfully, False if not
-        """
-        temp_file = "temp{}_max".format(self.ss_index)
-        temperature = temperature *1000
-        self.__set_threshold(temp_file, temperature)
-        
-        return True
 
     def get_name(self):
         """
@@ -236,3 +231,30 @@ class Thermal(ThermalBase):
             A boolean value, True if replaceable, False if not
         """
         return False
+
+    def _try_get_threshold(self, type):
+        if self.THRESHOLDS is None:
+            self.THRESHOLDS = self.THRESHOLDS_F2B if is_fan_dir_F2B() else self.THRESHOLDS_B2F
+
+        if self.index in self.THRESHOLDS:
+            return getattr(self.THRESHOLDS[self.index], type)
+        else:
+            return None
+
+    def get_high_critical_threshold(self):
+        return self._try_get_threshold('high_crit')
+
+    def get_low_critical_threshold(self):
+        return self._try_get_threshold('low_crit')
+
+    def get_high_threshold(self):
+        return self._try_get_threshold('high_err')
+
+    def get_low_threshold(self):
+        return self._try_get_threshold('low_err')
+
+    def get_high_warning_threshold(self):
+        return self._try_get_threshold('high_warn')
+
+    def get_low_warning_threshold(self):
+        return self._try_get_threshold('low_warn')
