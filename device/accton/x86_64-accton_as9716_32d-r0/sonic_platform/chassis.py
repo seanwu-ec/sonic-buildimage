@@ -88,6 +88,7 @@ class Chassis(ChassisBase):
 
     def __initialize_thermals(self):
         from sonic_platform.thermal import Thermal
+        self._thermal_list.append(Thermal(is_cpu=True))
         for index in range(0, NUM_THERMAL):
             thermal = Thermal(index)
             self._thermal_list.append(thermal)
