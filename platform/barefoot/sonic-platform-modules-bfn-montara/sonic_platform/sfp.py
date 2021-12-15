@@ -310,7 +310,11 @@ class Sfp(SfpBase):
 
     def get_transceiver_info(self):
         with Sfp.sfputil.eeprom_action() as u:
-            return u.get_transceiver_info_dict(self.port_num)
+            info = u.get_transceiver_info_dict(self.port_num)
+            # XXX https://github.com/Azure/sonic-platform-common/issues/250
+            if "vendor_rev" not in info:
+                info["vendor_rev"] = info.get("hardware_rev", "N/A")
+            return info
 
     def get_transceiver_bulk_status(self):
         status = dict()
@@ -392,7 +396,7 @@ class Sfp(SfpBase):
 
     def get_revision(self):
         info = self.get_transceiver_info()
-        return info.get("hardware_rev", "N/A")
+        return info.get("vendor_rev", "N/A")
 
     def get_status(self):
         return self.get_presence() and bool(self.get_transceiver_bulk_status())
