@@ -69,10 +69,6 @@ class SfpUtil(SfpUtilBase):
         def qsfp_max_port_get(client):
             return client.pltfm_mgr.pltfm_mgr_qsfp_get_max_port()
 
-    def update_port_info(self):
-        def qsfp_max_port_get(client):
-            return client.pltfm_mgr.pltfm_mgr_qsfp_get_max_port()
-
         if self.QSFP_PORT_END == 0:
             platform = device_info.get_platform()
             self.QSFP_PORT_END = thrift_try(qsfp_max_port_get)

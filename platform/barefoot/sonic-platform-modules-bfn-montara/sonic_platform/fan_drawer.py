@@ -1,9 +1,7 @@
 try:
-    from sonic_platform.platform_thrift_client import thrift_try
     from sonic_platform_base.fan_drawer_base import FanDrawerBase
-    from sonic_platform_base.fan_base import FanBase
     from sonic_py_common import device_info
-    from fan import Fan
+    from .fan import Fan
 except ImportError as e:
     raise ImportError (str(e) + "- required module not found")
 
@@ -87,9 +85,6 @@ class FanDrawer(FanDrawerBase):
         return 36.0
 
 def fan_drawer_list_get():
-    max_fan = 5
-    max_fantray = 1
-
     platform = device_info.get_platform()
     if platform in ["x86_64-accton_as9516_32d-r0", "x86_64-accton_as9516bf_32d-r0"]:
         max_fantray = 1
@@ -98,7 +93,7 @@ def fan_drawer_list_get():
         max_fantray = 2
         max_fan = 5
     else:
-        max_fan = 5
         max_fantray = 1
+        max_fan = 5
     
     return [FanDrawer(i, max_fan) for i in range(1, max_fantray + 1)]
