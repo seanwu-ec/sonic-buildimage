@@ -95,5 +95,5 @@ def fan_drawer_list_get():
     else:
         max_fantray = 1
         max_fan = 5
-    
+
     return [FanDrawer(i, max_fan) for i in range(1, max_fantray + 1)]
