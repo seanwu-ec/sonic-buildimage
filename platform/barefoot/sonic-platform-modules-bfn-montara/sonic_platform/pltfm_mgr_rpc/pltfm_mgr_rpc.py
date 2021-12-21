@@ -6705,12 +6705,12 @@ class pltfm_mgr_qsfp_pwr_override_set_args(object):
                     self.port_num = iprot.readI32()
                 else:
                     iprot.skip(ftype)
-            elif fid == -1:
+            elif fid == 2:
                 if ftype == TType.BOOL:
                     self.power_override = iprot.readBool()
                 else:
                     iprot.skip(ftype)
-            elif fid == -2:
+            elif fid == 3:
                 if ftype == TType.BOOL:
                     self.power_set = iprot.readBool()
                 else:
@@ -6725,17 +6725,17 @@ class pltfm_mgr_qsfp_pwr_override_set_args(object):
             oprot.trans.write(oprot._fast_encode(self, [self.__class__, self.thrift_spec]))
             return
         oprot.writeStructBegin('pltfm_mgr_qsfp_pwr_override_set_args')
-        if self.power_set is not None:
-            oprot.writeFieldBegin('power_set', TType.BOOL, -2)
-            oprot.writeBool(self.power_set)
-            oprot.writeFieldEnd()
-        if self.power_override is not None:
-            oprot.writeFieldBegin('power_override', TType.BOOL, -1)
-            oprot.writeBool(self.power_override)
-            oprot.writeFieldEnd()
         if self.port_num is not None:
             oprot.writeFieldBegin('port_num', TType.I32, 1)
             oprot.writeI32(self.port_num)
+            oprot.writeFieldEnd()
+        if self.power_override is not None:
+            oprot.writeFieldBegin('power_override', TType.BOOL, 2)
+            oprot.writeBool(self.power_override)
+            oprot.writeFieldEnd()
+        if self.power_set is not None:
+            oprot.writeFieldBegin('power_set', TType.BOOL, 3)
+            oprot.writeBool(self.power_set)
             oprot.writeFieldEnd()
         oprot.writeFieldStop()
         oprot.writeStructEnd()
@@ -6754,7 +6754,12 @@ class pltfm_mgr_qsfp_pwr_override_set_args(object):
     def __ne__(self, other):
         return not (self == other)
 all_structs.append(pltfm_mgr_qsfp_pwr_override_set_args)
-pltfm_mgr_qsfp_pwr_override_set_args.thrift_spec = ()
+pltfm_mgr_qsfp_pwr_override_set_args.thrift_spec = (
+    None,  # 0
+    (1, TType.I32, 'port_num', None, None, ),  # 1
+    (2, TType.BOOL, 'power_override', None, None, ),  # 2
+    (3, TType.BOOL, 'power_set', None, None, ),  # 3
+)
 
 
 class pltfm_mgr_qsfp_pwr_override_set_result(object):
